@@ -91,10 +91,11 @@ def get_top_5_predictions(mask_dir):
 
 
 csv_file = './data/BBox_List_2017.csv'
-masks = '.\\repeat_4'
+#masks = '.\\results\\Atelectasis\\gradcam\\repeat_1'
+masks = '.\\repeat_1'
 im_size = 224
 
-truth_boxes = get_truth_boxes('Cardiomegaly', csv_file, 1024, im_size)
+truth_boxes = get_truth_boxes('Pneumothorax', csv_file, 1024, im_size)
 predictions = get_top_5_predictions(masks)
 
 for t in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:

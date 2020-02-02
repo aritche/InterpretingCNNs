@@ -106,7 +106,7 @@ class DenseBlock3(nn.Module):
     def __init__(self, model_name='model.pth'):
         super(DenseBlock3, self).__init__()
 
-        self.model = torch.load(model_name, map_location=lambda storage, loc: storage) # map_locations has to do with converting from CUDA to CPU
+        self.model = torch.load(model_name)
 
         self.part1 = self.model.features[:9]
         self.part2 = self.model.features[9:]
@@ -150,7 +150,7 @@ def preprocess(fn, size):
 
     return torch.FloatTensor(im.float()).to('cuda')
 
-def grad_cam(im_path, model, block_name):
+def grad_cam(im_path, model, block_name, backprop_index):
     # Feed forward
     img = preprocess(im_path, 224)
 
@@ -159,7 +159,7 @@ def grad_cam(im_path, model, block_name):
     output = model(img)
 
     # Backprop
-    index_num = int(sys.argv[1]) # class to produce a visualisation for
+    index_num = backprop_index # class to produce a visualisation for
     output[:, index_num].backward()
 
     # Establish file name based on top-k predictions
@@ -220,12 +220,15 @@ def grad_cam(im_path, model, block_name):
     #superimposed_img = heatmap * 0.4 + img * 0.6
     #cv2.imwrite(fn + '_' + block_name + '.png', superimposed_img)
 
-model_path = input(".pth file: ")
+class_name = sys.argv[1]
+backprop_index = int(sys.argv[2])
+model_path = sys.argv[3] # .pth file
+
 model = DenseBlock4(model_name=model_path)
 model.eval()
 
 i = 0
-for fn in glob("./data/cardio_images_256/*.png"):
-    grad_cam(fn, model, '4')
+for fn in glob("./data/localisation_classes_256/" + class_name + "/*.png"):
+    grad_cam(fn, model, '4', backprop_index)
     i += 1
     print(i)
