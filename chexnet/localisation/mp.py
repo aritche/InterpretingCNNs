@@ -3,6 +3,7 @@ from torch.autograd import Variable
 import cv2
 import numpy as np
 from glob import glob
+import sys
 
 use_cuda = torch.cuda.is_available()
 FloatTensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
@@ -200,8 +201,11 @@ def generate_mask(fn, max_iterations, perturb_type, im_size, mask_size, tv_beta,
 
 
 
-TARGET_CATEGORY = int(input("Target Category:"))
-MODEL_NAME = input(".pth file:")
+#TARGET_CATEGORY = int(input("Target Category:"))
+#MODEL_NAME = input(".pth file:")
+CLASS_NAME = sys.argv[1]
+TARGET_CATEGORY = int(sys.argv[2])
+MODEL_NAME = sys.argv[3] # .pth file
 model = load_model(MODEL_NAME)
 
 output_dir = '.'
@@ -216,7 +220,7 @@ tv_coeff = 10
 l1_coeff = 0.11
 
 i = 0
-for fn in glob('./cardio_images_256/*.png'):
+for fn in glob('./data/localisation_classes_256/' + CLASS_NAME + '/*.png'):
   generate_mask(fn, max_iterations, perturb_type, im_size, mask_size, tv_beta, learning_rate, l1_coeff, tv_coeff, output_dir)
   i += 1
   print(i)
